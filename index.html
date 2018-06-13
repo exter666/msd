@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SVG.js</title>
+    <script type="text/javascript" src="svg.min.js"></script>
+    <script type="text/javascript" src="svg.draggable.min.js"></script>
+    <script type="text/javascript" src="data.js"></script>
+    <script type="text/javascript" src="msd.js"></script>
+    <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        #drawing {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #info {
+            position: absolute;
+            background-color: #fff;
+        }
+    </style>
+
+    <template id="tableInfoRow">
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </template>
+</head>
+
+<body>
+    <div id="drawing"></div>
+    <div id="info">
+        <div  style="cursor: pointer;"><span id="hideBtn">скрыть\открыть</span><span>&nbsp;&nbsp;&nbsp;</span><!--<span id="zoom">100%</span>--></div>
+        <table id="tableInfo">
+            <thead>
+                <tr>
+                    <td style="width:100px">Наименование</td>
+                    <td style="width:200px">Значение</td>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- existing data could optionally be included here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
