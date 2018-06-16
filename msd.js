@@ -15,7 +15,7 @@ const COLOR_SELECTED_TWO_LINE = "#f23";
 const COLOR_DEFAULT = "#fff";
 const COLOR_DEFAULT_LINE = "#000";
 const LINK_TO_OFFSET = 20;
-const INFO_WIDTH = 300;
+const INFO_WIDTH = 600;
 const INFO_HEIGHT = 600;
 var startMoveX
 var startMoveY
@@ -156,17 +156,28 @@ function selectComponent(group, component) {
         var to = ""
         model.links.forEach(link => {
             if (component.id == link.from.component) {
-                to += link.to.component + (link.to.topic ? ", topic: " + link.to.topic : "") + "; "
+                var topic = link.to.topic ? "topic: " + link.to.topic : null
+                var group = link.to.group ? "group: " + link.to.group : null
+                var add = null
+                add = (topic) ? topic : add
+                add = (topic && group) ? add + ", " + group : add
+                to += link.to.component + (add ? "(" + add + ")" : "") + "; "
             }
 
             if (component.id == link.to.component) {
-                from += link.from.component + (link.from.topic ? ", topic: " + link.from.topic : "") + (link.from.group ? ", group: " + link.from.group : "") + "; "
+                var topic = link.from.topic ? "topic: " + link.from.topic : null
+                var group = link.from.group ? "group: " + link.from.group : null
+                var add = null
+                add = (topic) ? topic : add
+                add = (topic && group) ? add + ", " + group : add
+                from += link.from.component + (add ? "(" + add + ")" : "") + "; "
             }
 
         })
 
         dataRow.push(["from", from])
         dataRow.push(["to", to])
+        dataRow.push(["specApi", component.specApi])
 
         data.push(dataRow)
 
@@ -289,7 +300,7 @@ function drawLink(draw, componentFrom, componentTo, link) {
     var from = getLinkPositionXY(componentFrom, link.from.position)
     var to = getLinkPositionXY(componentTo, link.to.position, true)
 
-    line = draw.line(from.x, from.y, to.x, to.y).stroke({ width: 1, color: COLOR_DEFAULT_LINE })
+    line = draw.line(from.x, from.y, to.x, to.y).stroke({ width: 1, color: COLOR_DEFAULT_LINE }).back()
 
     var circle = draw.circle(circleRadius)
         .attr({ fill: COLOR_DEFAULT, stroke: COLOR_DEFAULT_LINE, "stroke-width": "1px" })
@@ -329,12 +340,12 @@ function initInfo() {
         (tb.style.display == "none") ? tb.style.display = "" : tb.style.display = "none"
 
     });
-/*
-    var zoomBtn = document.querySelector('#zoom')
-    zoomBtn.addEventListener("click", function(){
-        zoom(1)
-    });
-*/
+    /*
+        var zoomBtn = document.querySelector('#zoom')
+        zoomBtn.addEventListener("click", function(){
+            zoom(1)
+        });
+    */
 
 }
 
@@ -362,8 +373,26 @@ function updateInfo(data) {
 
             var t = document.querySelector('#tableInfoRow');
             td = t.content.querySelectorAll("td");
+            td[0].textContent = ""
+            td[1].textContent = ""
+            
             td[0].textContent = dataCol[0];
-            td[1].textContent = dataCol[1];
+
+            if (dataCol[1]) {
+                if (dataCol[1].startsWith('http')) {
+                    var newA = document.createElement("a");
+
+                    newA.href = dataCol[1];
+                    newA.textContent = dataCol[1];
+                    newA.target = "_blank";
+
+                    td[1].appendChild(newA);
+                } else {
+                    td[1].textContent = dataCol[1];
+                }
+            } else {
+                td[1].textContent = "";
+            }
 
             var clone = document.importNode(t.content, true);
             tb.appendChild(clone);
