@@ -2,6 +2,8 @@
  * Micro Service Diagram
  * 
  * Kochetov Aleksey
+ * 
+ * https://github.com/exter666/msd.git
  *
  * Date: 2018-06-01T00:00Z
  */
@@ -10,8 +12,7 @@ var scale = 1
 const COMPONENT_WIDTH = 150;
 const COMPONENT_HEIGHT = 100;
 const TEXT_PADDING = 40;
-const COLOR_SELECTED = "#f0f";
-const COLOR_SELECTED_TWO_LINE = "#f23";
+const COLOR_SELECTED = "#ff3600";
 const COLOR_DEFAULT = "#fff";
 const COLOR_DEFAULT_LINE = "#000";
 const LINK_TO_OFFSET = 20;
@@ -22,16 +23,19 @@ var startMoveY
 var isMouseDown = false
 var drawContainerId = "drawing"
 var infoContainerId = "info"
+var tableInfoRow = "tableInfoRow"
 var circleRadius = 20
 
 var drawModel = {
     lines: [],
-    groups: []
+    group: null
 }
 
 var componentSelected = []
 
 function drawModelDo(draw, model) {
+
+    drawModel.group = draw.group()
 
     model.components.forEach(component => {
 
@@ -39,11 +43,10 @@ function drawModelDo(draw, model) {
         var group = draw.group()
             .move(component.x, component.y)
             .draggable()
-
             .on('dragmove', function (e) {
 
-                component.x = this.x() / scale;
-                component.y = this.y() / scale;
+                component.x = this.x();
+                component.y = this.y();
 
                 var componentLines = getComponentLines(component, drawModel.lines)
 
@@ -116,7 +119,7 @@ function drawModelDo(draw, model) {
 
         group.add(text)
 
-        drawModel.groups.push({ component: component, group: group })
+        drawModel.group.add(group)
     });
 
     //links
@@ -126,6 +129,9 @@ function drawModelDo(draw, model) {
         var line = drawLink(draw, componentFrom, componentTo, link)
 
         drawModel.lines.push({ from: componentFrom, to: componentTo, line: line, link: link })
+        drawModel.group.add(line.line)
+        drawModel.group.add(line.circle)
+
     })
 }
 
@@ -351,7 +357,7 @@ function initInfo() {
 
 function updateInfo(data) {
 
-    var tb = document.querySelector("#info tbody");
+    var tb = document.querySelector("#" + infoContainerId + " tbody");
 
     //clear
     while (tb.firstChild) {
@@ -361,7 +367,7 @@ function updateInfo(data) {
     //fill
     Array.from(data).forEach(dataRow => {
 
-        var t = document.querySelector('#tableInfoRow');
+        var t = document.querySelector('#' + tableInfoRow);
         td = t.content.querySelectorAll("td");
         td[0].textContent = "---";
         td[1].textContent = "---";
@@ -371,11 +377,11 @@ function updateInfo(data) {
 
         Array.from(dataRow).forEach(dataCol => {
 
-            var t = document.querySelector('#tableInfoRow');
+            var t = document.querySelector('#' + tableInfoRow);
             td = t.content.querySelectorAll("td");
             td[0].textContent = ""
             td[1].textContent = ""
-            
+
             td[0].textContent = dataCol[0];
 
             if (dataCol[1]) {
@@ -397,8 +403,6 @@ function updateInfo(data) {
             var clone = document.importNode(t.content, true);
             tb.appendChild(clone);
         })
-
-
 
     })
 
@@ -422,16 +426,8 @@ function onWheel(e) {
 
 function zoom(scale) {
 
-    Array.from(drawModel.groups).forEach(componentGroup => {
-        var x = componentGroup.component.x;
-        var y = componentGroup.component.y;
-        componentGroup.group.node.setAttribute("transform", "translate(" + (x * scale) + "," + (y * scale) + ") scale(" + scale + ")")
-    })
+    drawModel.group.node.setAttribute("transform", "translate(" + drawModel.group.x() + "," + drawModel.group.y() + ") scale(" + scale + ")")
 
-    Array.from(drawModel.lines).forEach(componentLine => {
-        componentLine.line.line.node.setAttribute("transform", "scale(" + scale + ")")
-        componentLine.line.circle.node.setAttribute("transform", "scale(" + scale + ")")
-    })
 }
 
 function onMousedown(e) {
@@ -469,26 +465,10 @@ function onMousemove(e) {
         startMoveX = e.clientX
         startMoveY = e.clientY
 
-        Array.from(drawModel.groups).forEach(componentGroup => {
-            group = componentGroup.group
-            var x = componentGroup.component.x + deltaX
-            var y = componentGroup.component.y + deltaY
+        var x = drawModel.group.x() + deltaX / scale
+        var y = drawModel.group.y() + deltaY / scale
 
-            group.move(x * scale, y * scale)
-
-            componentGroup.component.x = x;
-            componentGroup.component.y = y;
-
-        })
-
-        Array.from(drawModel.lines).forEach(componentLine => {
-            var line = componentLine.line.line
-            line.move(line.x() + deltaX, line.y() + deltaY)
-
-            var circle = componentLine.line.circle
-            circle.move(circle.x() + deltaX, circle.y() + deltaY)
-
-        })
+        drawModel.group.move(x, y)
 
     }
 
