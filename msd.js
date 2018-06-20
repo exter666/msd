@@ -418,15 +418,20 @@ function onWheel(e) {
 
     var scaleLocal = delta < 0 ? scale + 0.1 : scale - 0.1
 
+    var prevscale = scale
+
     scale = (0.1 < scaleLocal && scaleLocal < 2) ? scaleLocal : scale
 
-    zoom(scale)
+    zoom(scale, prevscale, e.clientX, e.clientY)
 
 }
 
-function zoom(scale) {
+function zoom(scale, prevscale, x, y) {
 
-    drawModel.group.node.setAttribute("transform", "translate(" + drawModel.group.x() + "," + drawModel.group.y() + ") scale(" + scale + ")")
+    var nX = x - (drawModel.group.x() * -1 + x) / prevscale * scale
+    var nY = y - (drawModel.group.y() * -1 + y) / prevscale * scale
+
+    drawModel.group.node.setAttribute("transform", "translate(" + nX + "," + nY + ") scale(" + scale + ")")
 
 }
 
