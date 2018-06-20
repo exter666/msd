@@ -183,7 +183,12 @@ function selectComponent(group, component) {
 
         dataRow.push(["from", from])
         dataRow.push(["to", to])
-        dataRow.push(["specApi", component.specApi])
+
+        if (component.customAttrs)
+            Array.from(Object.keys(component.customAttrs)).forEach(key => {
+
+                dataRow.push([key, component.customAttrs[key]])
+            })
 
         data.push(dataRow)
 

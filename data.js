@@ -6,7 +6,11 @@ var model = {
             "name": "service 1",
             "type": "service",
             "x": 0,
-            "y": 0
+            "y": 0,
+            "customAttrs": {
+                "attr1": "123",
+                "attr2": "asdf"
+            }
         },
         {
             "id": "q1",
