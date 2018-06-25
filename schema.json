@@ -1,0 +1,150 @@
+{
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string",
+            "description": "Версия диаграммы"
+        },
+        "regions": {
+            "type": "object",
+            "description": "Области",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Ид"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Наименование"
+                },
+                "x": {
+                    "type": "number",
+                    "description": "Координата x"
+                },
+                "y": {
+                    "type": "number",
+                    "description": "Координата Y"
+                },
+                "height": {
+                    "type": "string",
+                    "description": "высота"
+                },
+                "width": {
+                    "type": "string",
+                    "description": "ширина"
+                },
+                "styleAttr": {
+                    "type": "object",
+                    "description": "Атрибуты визуального отображения\nhttps://developer.mozilla.org/ru/docs/Web/SVG/%D0%AD%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82/rect"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "x",
+                "y",
+                "height",
+                "width"
+            ]
+        },
+        "links": {
+            "type": "array",
+            "description": "связи компонентов между собой",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "from": {
+                        "$ref": "#/definitions/linkAttrs"
+                    },
+                    "to": {
+                        "$ref": "#/definitions/linkAttrs"
+                    }
+                },
+                "required": [
+                    "from",
+                    "to"
+                ]
+            }
+        },
+        "name": {
+            "type": "string",
+            "description": "Наименование"
+        },
+        "components": {
+            "type": "array",
+            "description": "Компоненты",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Ид"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Наименование"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Тип:\ndb - БД\nservice - Сервис\nqueue - Очередь",
+                        "default": "service",
+                        "enum": [
+                            [
+                                "db",
+                                "service",
+                                "queue"
+                            ]
+                        ]
+                    },
+                    "x": {
+                        "type": "number",
+                        "description": "Координата x"
+                    },
+                    "y": {
+                        "type": "number",
+                        "description": "Координата y"
+                    },
+                    "customAttrs": {
+                        "type": "object",
+                        "description": "Произвольные атрибуты в виде ключ значение"
+                    }
+                },
+                "required": [
+                    "id",
+                    "type",
+                    "x",
+                    "y"
+                ]
+            }
+        },
+        "linkAttrs": {
+            "type": "object",
+            "properties": {
+                "component": {
+                    "type": "string",
+                    "description": "Ид компонента"
+                },
+                "position": {
+                    "type": "string",
+                    "description": "положение крепления связи"
+                },
+                "topic": {
+                    "type": "string",
+                    "description": "топик очереди"
+                },
+                "group": {
+                    "type": "string",
+                    "description": "группа очереди"
+                }
+            },
+            "required": [
+                "component",
+                "position"
+            ]
+        }
+    },
+    "required": [
+        "version",
+        "name"
+    ]
+}
