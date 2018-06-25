@@ -12,6 +12,7 @@ var scale = 1
 const COMPONENT_WIDTH = 150;
 const COMPONENT_HEIGHT = 100;
 const TEXT_PADDING = 40;
+const REG_TEXT_PADDING = 20;
 const COLOR_SELECTED = "#ff3600";
 const COLOR_DEFAULT = "#fff";
 const COLOR_DEFAULT_LINE = "#000";
@@ -36,6 +37,40 @@ var componentSelected = []
 function drawModelDo(draw, model) {
 
     drawModel.group = draw.group()
+
+    //region
+    model.regions.forEach(region => {
+
+        rect = draw.rect(region.width, region.height)
+
+        rect.move(region.x, region.y)
+
+        rect.attr(region.styleAttr)
+
+        drawModel.group.add(rect)
+
+        //text
+        var text = draw
+            .text(region.name)
+
+        text.x(region.x + REG_TEXT_PADDING)
+        text.y(region.y + REG_TEXT_PADDING)
+
+        drawModel.group.add(text)
+
+    })
+
+    //links
+    model.links.forEach(link => {
+        var componentFrom = getNodeById(model.components, link.from.component)
+        var componentTo = getNodeById(model.components, link.to.component)
+        var line = drawLink(draw, componentFrom, componentTo, link)
+
+        drawModel.lines.push({ from: componentFrom, to: componentTo, line: line, link: link })
+        drawModel.group.add(line.line)
+        drawModel.group.add(line.circle)
+
+    })    
 
     model.components.forEach(component => {
 
@@ -122,17 +157,6 @@ function drawModelDo(draw, model) {
         drawModel.group.add(group)
     });
 
-    //links
-    model.links.forEach(link => {
-        var componentFrom = getNodeById(model.components, link.from.component)
-        var componentTo = getNodeById(model.components, link.to.component)
-        var line = drawLink(draw, componentFrom, componentTo, link)
-
-        drawModel.lines.push({ from: componentFrom, to: componentTo, line: line, link: link })
-        drawModel.group.add(line.line)
-        drawModel.group.add(line.circle)
-
-    })
 }
 
 function selectComponent(group, component) {
