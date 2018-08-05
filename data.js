@@ -1,5 +1,36 @@
 var model = {
     "name": "test",
+    "regions": [
+        ,
+        {
+            "id": "reg0",
+            "name": "Контур 2",
+            "x": 160,
+            "y": 100,
+            "height": 280,
+            "width": 530,
+            "styleAttr": {
+                "fill": "#ebffff",
+                "stroke": "#000",
+                "stroke-width": "1px",
+                "stroke-dasharray": "20"
+            }
+        },           
+        {
+            "id": "reg0",
+            "name": "Контур 1",
+            "x": 170,
+            "y": 150,
+            "height": 200,
+            "width": 200,
+            "styleAttr": {
+                "fill": "#ebf1df",
+                "stroke": "#000",
+                "stroke-width": "1px",
+                "stroke-dasharray": "20"
+            }
+        }     
+    ],
     "components": [
         {
             "id": "s1",
