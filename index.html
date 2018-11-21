@@ -4,7 +4,7 @@
 <head>
     <title>SVG.js</title>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.5/svg.min.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/svgdotjs/svg.draggable.js/master/dist/svg.draggable.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/svgdotjs/svg.draggable.js/2.2.1/dist/svg.draggable.min.js"></script>
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="msd.js"></script>
     <style type="text/css">
@@ -64,7 +64,7 @@
     </template>
 </head>
 
-<body>
+<body onload="(new MSD()).init({model: model})">
     <div id="drawing"></div>
     <div id="info">
         <div  style="cursor: pointer;"><span id="hideBtn">скрыть\открыть</span><span>&nbsp;&nbsp;&nbsp;</span><!--<span id="zoom">100%</span>--></div>
