@@ -84,7 +84,7 @@ function MSD() {
                 .on('dragmove', function (e) {
     
                     component.x = e.currentTarget.instance.x();
-                    component.y = e.currentTarget.instance.y();
+                    component.y = e.currentTarget.instance.y();                    
     
                     var componentLines = this.getComponentLines(component, this.drawModel.lines)
     
@@ -147,6 +147,7 @@ function MSD() {
             polygon.attr({ fill: this.COLOR_DEFAULT, stroke: this.COLOR_DEFAULT_LINE, "stroke-width": "2px" })
     
             group.add(polygon)
+            component.group = group
     
             //text
             var text = draw
@@ -162,6 +163,16 @@ function MSD() {
     
     }
     
+    this.selectComponentById = function(componentId) {
+
+        this.model.components.forEach(component => {
+
+            if (component.id == componentId)
+                this.selectComponent(component.group, component)
+        })
+        
+    }
+
     this.selectComponent = function(group, component) {
     
         var idx = this.componentSelected.indexOf(component)
@@ -181,29 +192,49 @@ function MSD() {
     
         Array.from(this.componentSelected).forEach(component => {
     
+            if (!component == null) return;
+
             var dataRow = []
             dataRow.push(["id", component.id])
             dataRow.push(["name", component.name])
     
-            var from = ""
-            var to = ""
+            var from = {
+                components: []
+            }
+
+            var to = {
+                components: []
+            }
+
             this.model.links.forEach(link => {
+                
+                var add = null
+
                 if (component.id == link.from.component) {
                     var topic = link.to.topic ? "topic: " + link.to.topic : null
                     var group = link.to.group ? "group: " + link.to.group : null
-                    var add = null
                     add = (topic) ? topic : add
                     add = (topic && group) ? add + ", " + group : add
-                    to += link.to.component + (add ? "(" + add + ")" : "") + "; "
+                    //to += "<b onClick='console.log(this.model)'>" + link.to.component + "</b>" + (add ? "(" + add + ")" : "") + ";<br>"
+
+                    to.components.push({
+                        component: link.to.component,
+                        linkInfo: (add ? "(" + add + ")" : "") + ";"    
+                    })
+
                 }
     
                 if (component.id == link.to.component) {
                     var topic = link.from.topic ? "topic: " + link.from.topic : null
                     var group = link.from.group ? "group: " + link.from.group : null
-                    var add = null
                     add = (topic) ? topic : add
                     add = (topic && group) ? add + ", " + group : add
-                    from += link.from.component + (add ? "(" + add + ")" : "") + "; "
+                    //from += "<b>" + link.from.component + "</b>" + (add ? "(" + add + ")" : "") + ";<br>"
+
+                    from.components.push({
+                        component: link.from.component,
+                        linkInfo: (add ? "(" + add + ")" : "") + ";"    
+                    })
                 }
     
             })
@@ -367,9 +398,13 @@ function MSD() {
         this.draw.node.addEventListener("mouseup", this.onMouseup.bind(this));
         this.draw.node.addEventListener("mousemove", this.onMousemove.bind(this));
 
+        document.addEventListener("mouseout", this.onMouseOut.bind(this));
+
         this.drawModelDo.bind(this)(this.draw, this.model);
     
         this.initInfo();
+
+        return this;
     }
     
     this.initInfo = function() {
@@ -391,8 +426,8 @@ function MSD() {
     
     this.updateInfo = function(data) {
     
-        var tb = document.querySelector("#" + this.infoContainerId + " tbody");
-    
+        var tb = document.querySelector("#" + this.infoContainerId + " tbody");    
+
         //clear
         while (tb.firstChild) {
             tb.removeChild(tb.firstChild);
@@ -416,10 +451,10 @@ function MSD() {
                 td[0].textContent = ""
                 td[1].textContent = ""
     
-                td[0].textContent = dataCol[0];
-    
+                td[0].textContent = dataCol[0];                
+                    
                 if (dataCol[1]) {
-                    if (dataCol[1].startsWith('http')) {
+                    if (typeof  dataCol[1] == "string" && dataCol[1].startsWith('http')) {
                         var newA = document.createElement("a");
     
                         newA.href = dataCol[1];
@@ -427,8 +462,31 @@ function MSD() {
                         newA.target = "_blank";
     
                         td[1].appendChild(newA);
-                    } else {
-                        td[1].textContent = dataCol[1];
+                        
+                    } else if (typeof  dataCol[1] == "object") {
+                        dataCol[1].components.forEach(direct => {
+
+                            var newB = document.createElement("b");
+                            newB.innerHTML = direct.component;
+
+                            newB.addEventListener("click", function(){
+                                this.selectComponentById(direct.component)
+                            }, false);    
+
+                            td[1].appendChild(newB);
+
+                            var newSpan = document.createElement("span");
+                            newSpan.innerHTML = direct.linkInfo;
+                            td[1].appendChild(newSpan);
+
+                            var newBr = document.createElement("br");
+                            td[1].appendChild(newBr);
+
+                        })
+                    } else {                                                
+
+                        td[1].innerHTML = dataCol[1]
+
                     }
                 } else {
                     td[1].textContent = "";
@@ -475,8 +533,8 @@ function MSD() {
         this.startMoveX = e.clientX
         this.startMoveY = e.clientY
     
-        this.isMouseDown = true
-    
+        this.isMouseDown = true        
+
         e.preventDefault();
     
     }
@@ -485,6 +543,8 @@ function MSD() {
         e = e || window.event;
     
         this.isMouseDown = false
+
+        e.preventDefault();
     
     }
     
@@ -506,6 +566,16 @@ function MSD() {
     
         }
 
- }
+    }
+
+    this.onMouseOut = function(e) {
+        e = e || window.event;
+    
+        var from = e.relatedTarget || e.toElement;
+        if (!from || from.nodeName == "HTML") {
+            this.isMouseDown = false                        
+        }
+    
+    }
 
 }
